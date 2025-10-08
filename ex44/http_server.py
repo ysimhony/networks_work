@@ -9,7 +9,7 @@ import os
 
 # TO DO: set constants
 IP = '0.0.0.0'
-PORT = 12345
+PORT = 80
 SOCKET_TIMEOUT = 0.1
 
 DEFAULT_URL = "index.html"
@@ -39,7 +39,20 @@ def handle_client_request(resource, client_socket):
     else:
         filename = ROOT_DIR + url
 
-    if not os.path.isfile(filename):
+    if filename == os.path.join(ROOT_DIR, "calculate-next"):
+        headers = (
+            "HTTP/1.0 200 OK\r\n"
+            f"Content-Type: text/plain; charset=utf-8\r\n"
+            f"Content-Length: 1\r\n"
+            "Connection: close\r\n"
+            "\r\n"
+        )
+        body = b"5"
+        response = headers.encode() + body
+        client_socket.sendall(response)
+        return
+
+    if not os.path.isfile(filename) and resource != "calculate-next":
         print("File not found: " + filename)
         body = b"404 Not Found"
         headers = (
