@@ -4,6 +4,7 @@
 # Note: The code is written in a simple way, without classes, log files or other utilities, for educational purpose
 # Usage: Fill the missing functions and constants
 # TO DO: import modules
+import re
 import socket
 import os
 
@@ -39,15 +40,25 @@ def handle_client_request(resource, client_socket):
     else:
         filename = ROOT_DIR + url
 
-    if filename == os.path.join(ROOT_DIR, "calculate-next"):
+    if filename.find(os.path.join(ROOT_DIR, "calculate-next")) != -1:
+        get_param = filename.split("?")[-1]
+        # s = "num=16; other=42"
+        number = 4
+        match = re.search(r'num=(\d+)', get_param)
+
+        if match:
+            number = int(match.group(1))
+            print(number)  # 16
+        number += 1
+        number_str = str(number)
         headers = (
             "HTTP/1.0 200 OK\r\n"
             f"Content-Type: text/plain; charset=utf-8\r\n"
-            f"Content-Length: 1\r\n"
+            f"Content-Length: {len(number_str)}\r\n"
             "Connection: close\r\n"
             "\r\n"
         )
-        body = b"5"
+        body = bytes(str(number), "utf-8")
         response = headers.encode() + body
         client_socket.sendall(response)
         return
